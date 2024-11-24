@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Image for Detection</title>
+  <link rel="stylesheet" href="input.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Upload Image for Detection</h1>
+    <p class="description">Select an image to upload to add detection of animal presence in your location.</p>
+    
+    <input type="file" id="imageInput" accept="image/*" class="file-input">
+    <button onclick="processImage()" class="upload-button">Process Image</button>
+  </div>
+  
+  <script>
+    async function processImage() {
+      const imageInput = document.getElementById('imageInput');
+      if (!imageInput.files[0]) {
+        alert("Please select an image file.");
+        return;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async function(position) {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          
+          const formData = new FormData();
+          formData.append('image', imageInput.files[0]);
+          formData.append('latitude', latitude);
+          formData.append('longitude', longitude);
+
+          const response = await fetch('http://localhost:5000/api/process-image', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const result = await response.json();
+          console.log("Processing Result:", result);
+          alert("Image processed successfully.");
+        }, function(error) {
+          alert("Geolocation error: " + error.message);
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+  </script>
+</body>
+</html>
