@@ -29,6 +29,10 @@ const upload = multer({ dest: 'uploads/' });
 //     }
 // })
 
+app.get('/', (req, res) => {
+    res.render("index",{apiKey: process.env.MAPS_API});
+});
+
 app.get('/api/detections', async (req, res) => {
     try{
         const detections = await Detection.find();
